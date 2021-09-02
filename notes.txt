@@ -1,0 +1,41 @@
+GOOS=windows GOARCH=amd64 go build
+
+
+Building DLL in go:
+
+go build -o helloworld.dll -buildmode=c-shared
+
+GOOS=windows GOARCH=386 CGO_ENABLED=1 GO386=softfloat CC=i686-w64-mingw32-gcc go build -buildmode=c-shared -o main.dll dll.go
+GOOS=windows GOARCH=amd64 CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc go build -buildmode=c-shared -o main.dll dll.go
+
+Reflectively inject a DLL in to a remote process.
+    -Can NOT return DLL output to the user when run remotely OR locally.
+    -Does NOT clean up memory in the remote process if/when DLL finishes execution.
+    -Great for planting backdoor on a system by injecting backdoor DLL in to another processes memory.
+    -Expects the DLL to have this function: void VoidFunc(). This is the function that will be called after the DLL is loaded
+
+Reflected DLL injection:
+
+1) Allocate space for the DLL and copy the DLL headers in to memory
+2) Copy the DLL sections to memory
+3) Perform base relocations on the sections loaded
+4) Load DLLs required by the DLL being loaded
+5) Set correct memory permissions in memory for the DLL
+6) Call DLLMain so the DLL knows it is loaded
+7) Return the handle to the DLL, which is the memory address of the first byte of the DLL
+
+1) Read raw DLL bytes into a memory buffer
+2) Parse DLL headers and get the SizeOfImage
+3) Allocate new memory space for the DLL of size SizeOfImage
+4)Copy over DLL headers and PE sections to the memory space allocated in step 3
+5) Perform image base relocations
+6) Load DLL imported libraries
+7) Resolve Import Address Table (IAT)
+8) Invoke the DLL with DLL_PROCESS_ATTACH reason
+
+
+		DWORD relocationsCount = (relocationBlock->BlockSize - sizeof(BASE_RELOCATION_BLOCK)) / sizeof(BASE_RELOCATION_ENTRY);
+		PBASE_RELOCATION_ENTRY relocationEntries = (PBASE_RELOCATION_ENTRY)(relocationTable + relocationsProcessed);
+
+
+
