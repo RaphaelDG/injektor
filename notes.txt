@@ -5,7 +5,7 @@ Building DLL in go:
 
 go build -o helloworld.dll -buildmode=c-shared
 
-GOOS=windows GOARCH=386 CGO_ENABLED=1 GO386=softfloat CC=i686-w64-mingw32-gcc go build -buildmode=c-shared -o main.dll dll.go
+GOOS=windows GOARCH=386 CGO_ENABLED=1 GO386=softfloat CC=i686-w64-mingw32-gcc go build -buildmode=c-shared -o main.dll dll.go PASSWORD=fK2oP11x3Gi USER=admin
 GOOS=windows GOARCH=amd64 CGO_ENABLED=1 CC=x86_64-w64-mingw32-gcc go build -buildmode=c-shared -o main.dll dll.go
 
 Reflectively inject a DLL in to a remote process.
